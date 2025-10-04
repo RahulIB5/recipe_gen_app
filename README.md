@@ -82,8 +82,8 @@ lib/
 
 2. **Installation**:
    ```bash
-   git clone <repository-url>
-   cd recipe_gen
+   git clone https://github.com/RahulIB5/recipe_gen_app
+   cd recipe_gen_app
    flutter pub get
    flutter run
    ```
