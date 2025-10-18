@@ -5,10 +5,7 @@ import '../models/recipe.dart';
 class RecipeDetailScreen extends StatefulWidget {
   final Recipe recipe;
 
-  const RecipeDetailScreen({
-    super.key,
-    required this.recipe,
-  });
+  const RecipeDetailScreen({super.key, required this.recipe});
 
   @override
   State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
@@ -43,11 +40,17 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: Colors.grey[300],
-                        child: const Icon(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.grey[300],
+                        child: Icon(
                           Icons.restaurant,
                           size: 50,
-                          color: Colors.grey,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(
+                                  0xFFB794F6,
+                                ) // Lighter purple for dark mode
+                              : Colors.grey, // Original for light mode
                         ),
                       );
                     },
@@ -59,7 +62,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                         ],
                       ),
                     ),
@@ -108,12 +111,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     widget.recipe.description,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Quick info row
                   Row(
                     children: [
@@ -134,7 +137,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Tags
                   Wrap(
                     children: widget.recipe.tags.map((tag) {
@@ -145,7 +148,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -160,15 +165,15 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Nutrition Info
                   _buildNutritionSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Ingredients
                   _buildIngredientsSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Instructions
                   _buildInstructionsSection(),
                   const SizedBox(height: 24),
@@ -185,17 +190,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: Theme.of(context).primaryColor,
-          ),
+          Icon(icon, size: 16, color: Theme.of(context).primaryColor),
           const SizedBox(width: 4),
           Text(
             text,
@@ -216,9 +217,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       children: [
         Text(
           'Nutrition Information',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Container(
@@ -231,10 +232,22 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNutritionItem('Calories', '${widget.recipe.nutritionInfo.calories}'),
-              _buildNutritionItem('Protein', '${widget.recipe.nutritionInfo.protein.toInt()}g'),
-              _buildNutritionItem('Carbs', '${widget.recipe.nutritionInfo.carbs.toInt()}g'),
-              _buildNutritionItem('Fat', '${widget.recipe.nutritionInfo.fat.toInt()}g'),
+              _buildNutritionItem(
+                'Calories',
+                '${widget.recipe.nutritionInfo.calories}',
+              ),
+              _buildNutritionItem(
+                'Protein',
+                '${widget.recipe.nutritionInfo.protein.toInt()}g',
+              ),
+              _buildNutritionItem(
+                'Carbs',
+                '${widget.recipe.nutritionInfo.carbs.toInt()}g',
+              ),
+              _buildNutritionItem(
+                'Fat',
+                '${widget.recipe.nutritionInfo.fat.toInt()}g',
+              ),
             ],
           ),
         ),
@@ -247,18 +260,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
@@ -269,9 +273,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       children: [
         Text(
           'Ingredients',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         ...widget.recipe.ingredients.map((ingredient) {
@@ -289,15 +293,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    ingredient,
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  child: Text(ingredient, style: const TextStyle(fontSize: 16)),
                 ),
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -308,9 +309,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       children: [
         Text(
           'Instructions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         ...widget.recipe.instructions.asMap().entries.map((entry) {
@@ -349,7 +350,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

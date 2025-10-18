@@ -18,12 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       centerTitle: centerTitle,
       leading: leading,
       actions: actions,
@@ -42,11 +37,7 @@ class ErrorDisplayWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const ErrorDisplayWidget({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const ErrorDisplayWidget({super.key, required this.message, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +47,21 @@ class ErrorDisplayWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[300],
-            ),
+            Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(
               'Oops! Something went wrong',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
@@ -125,10 +112,7 @@ class CustomFAB extends StatelessWidget {
       onPressed: onPressed,
       tooltip: tooltip,
       backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
-      child: Icon(
-        icon,
-        color: Colors.white,
-      ),
+      child: Icon(icon, color: Colors.white),
     );
   }
 }
@@ -158,7 +142,7 @@ class StyledCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -168,10 +152,7 @@ class StyledCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: card,
-      );
+      return GestureDetector(onTap: onTap, child: card);
     }
 
     return card;
@@ -203,17 +184,17 @@ class SectionHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     subtitle!,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ],
@@ -251,7 +232,7 @@ class SearchBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -264,10 +245,7 @@ class SearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           border: InputBorder.none,
-          icon: Icon(
-            Icons.search,
-            color: Colors.grey[400],
-          ),
+          icon: Icon(Icons.search, color: Colors.grey[400]),
         ),
       ),
     );

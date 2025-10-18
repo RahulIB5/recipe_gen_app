@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/recipe.dart';
-import '../data/dummy_data.dart';
 import '../widgets/recipe_card.dart';
+import '../services/gemini_service.dart';
 
 // AI Recipe Generator screen
 class AIRecipeGeneratorScreen extends StatefulWidget {
   const AIRecipeGeneratorScreen({super.key});
 
   @override
-  State<AIRecipeGeneratorScreen> createState() => _AIRecipeGeneratorScreenState();
+  State<AIRecipeGeneratorScreen> createState() =>
+      _AIRecipeGeneratorScreenState();
 }
 
 class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
@@ -19,10 +20,30 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
 
   // Common ingredients for quick selection
   final List<String> _commonIngredients = [
-    'Chicken', 'Beef', 'Fish', 'Eggs', 'Rice', 'Pasta', 'Potatoes',
-    'Tomatoes', 'Onions', 'Garlic', 'Cheese', 'Milk', 'Butter',
-    'Olive Oil', 'Salt', 'Pepper', 'Basil', 'Oregano', 'Lemon',
-    'Spinach', 'Mushrooms', 'Bell Peppers', 'Carrots', 'Broccoli',
+    'Chicken',
+    'Beef',
+    'Fish',
+    'Eggs',
+    'Rice',
+    'Pasta',
+    'Potatoes',
+    'Tomatoes',
+    'Onions',
+    'Garlic',
+    'Cheese',
+    'Milk',
+    'Butter',
+    'Olive Oil',
+    'Salt',
+    'Pepper',
+    'Basil',
+    'Oregano',
+    'Lemon',
+    'Spinach',
+    'Mushrooms',
+    'Bell Peppers',
+    'Carrots',
+    'Broccoli',
   ];
 
   @override
@@ -62,19 +83,85 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
       _generatedRecipe = null;
     });
 
-    // Simulate API call delay
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Use Gemini AI to generate recipes from ingredients
+      final recipes = await GeminiService.generateRecipeFromIngredients(
+        _selectedIngredients,
+      );
 
-    setState(() {
-      _generatedRecipe = DummyData.generateRecipeFromIngredients(_selectedIngredients);
-      _isGenerating = false;
-    });
+      setState(() {
+        // Use the first AI-generated recipe, or create a fallback
+        _generatedRecipe = recipes.isNotEmpty
+            ? recipes.first
+            : _createFallbackRecipe();
+        _isGenerating = false;
+      });
+
+      if (recipes.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Generated ${recipes.length} AI recipe(s)!'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error generating AI recipe: $e');
+      setState(() {
+        _generatedRecipe = _createFallbackRecipe();
+        _isGenerating = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('AI temporarily unavailable. Using fallback recipe.'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
+  Recipe _createFallbackRecipe() {
+    return Recipe(
+      id: 'generated_${DateTime.now().millisecondsSinceEpoch}',
+      title:
+          'AI Generated Recipe with ${_selectedIngredients.take(3).join(", ")}',
+      description:
+          'A delicious recipe created using your selected ingredients: ${_selectedIngredients.join(", ")}.',
+      imageUrl:
+          'https://images.unsplash.com/photo-1546548970-71785318a17b?w=400',
+      ingredients: [
+        ..._selectedIngredients,
+        'Salt to taste',
+        'Black pepper',
+        'Olive oil',
+      ],
+      instructions: [
+        'Prepare all ingredients by washing and chopping as needed.',
+        'Heat olive oil in a large pan over medium heat.',
+        'Add your main ingredients and cook until tender.',
+        'Season with salt and pepper to taste.',
+        'Serve hot and enjoy your AI-generated creation!',
+      ],
+      nutritionInfo: NutritionInfo(
+        calories: 350,
+        protein: 20.0,
+        carbs: 25.0,
+        fat: 15.0,
+        fiber: 5.0,
+      ),
+      cookingTime: 25,
+      difficulty: 'Easy',
+      tags: ['AI Generated', 'Custom', 'Quick'],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -103,15 +190,13 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                       children: [
                         Text(
                           'AI Recipe Generator',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Tell me what you have, I\'ll create magic!',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -125,7 +210,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -154,7 +239,9 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                               hintText: 'Type an ingredient...',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -166,7 +253,8 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () => _addIngredient(_ingredientsController.text),
+                          onPressed: () =>
+                              _addIngredient(_ingredientsController.text),
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -195,17 +283,20 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                   height: 120,
                   child: GridView.builder(
                     scrollDirection: Axis.horizontal,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.5,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 0.5,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
                     itemCount: _commonIngredients.length,
                     itemBuilder: (context, index) {
                       final ingredient = _commonIngredients[index];
-                      final isSelected = _selectedIngredients.contains(ingredient);
-                      
+                      final isSelected = _selectedIngredients.contains(
+                        ingredient,
+                      );
+
                       return GestureDetector(
                         onTap: () {
                           if (isSelected) {
@@ -215,9 +306,12 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected 
+                            color: isSelected
                                 ? Theme.of(context).primaryColor
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -230,7 +324,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                             child: Text(
                               ingredient,
                               style: TextStyle(
-                                color: isSelected 
+                                color: isSelected
                                     ? Colors.white
                                     : Theme.of(context).primaryColor,
                                 fontSize: 12,
@@ -264,7 +358,9 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                       child: Chip(
                         label: Text(ingredient),
                         onDeleted: () => _removeIngredient(ingredient),
-                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).primaryColor.withOpacity(0.1),
                         deleteIconColor: Theme.of(context).primaryColor,
                       ),
                     );
@@ -293,7 +389,9 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 12),
@@ -318,10 +416,7 @@ class _AIRecipeGeneratorScreenState extends State<AIRecipeGeneratorScreen> {
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    child: RecipeCard(
-                      recipe: _generatedRecipe!,
-                      isLarge: true,
-                    ),
+                    child: RecipeCard(recipe: _generatedRecipe!, isLarge: true),
                   ),
                 ),
             ],

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/main_navigation_screen.dart';
+import 'services/gemini_service.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
+  // Initialize Gemini AI services
+  GeminiService.initialize();
+
   runApp(const SmartChefApp());
 }
 
@@ -10,42 +16,22 @@ class SmartChefApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SmartChef',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6B46C1), // Purple primary color
-          brightness: Brightness.light,
-        ),
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          centerTitle: true,
-        ),
-        cardTheme: CardThemeData(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          filled: true,
-          fillColor: Colors.grey[50],
-        ),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'SmartChef',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeProvider.lightTheme,
+            darkTheme: ThemeProvider.darkTheme,
+            themeMode: themeProvider.isDarkMode
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            home: const MainNavigationScreen(),
+          );
+        },
       ),
-      home: const MainNavigationScreen(),
     );
   }
 }
