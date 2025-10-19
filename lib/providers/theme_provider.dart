@@ -27,11 +27,16 @@ class ThemeProvider extends ChangeNotifier {
 
   // Light Theme
   static ThemeData get lightTheme {
+    const Color customTextColor = Color(0xFFE91E63); // Pink color for text
+    const Color customPrimaryColor = Color(
+      0xFFE91E63,
+    ); // Same pink for primary elements
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF6B46C1), // Purple primary color
+        seedColor: customPrimaryColor, // Pink primary color instead of purple
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: Colors.grey[50],
@@ -41,7 +46,7 @@ class ThemeProvider extends ChangeNotifier {
         elevation: 0,
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
+        foregroundColor: customTextColor,
       ),
       cardTheme: CardThemeData(
         elevation: 2,
@@ -51,6 +56,8 @@ class ThemeProvider extends ChangeNotifier {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 2,
+          backgroundColor: customPrimaryColor,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -62,12 +69,28 @@ class ThemeProvider extends ChangeNotifier {
         fillColor: Colors.grey[50],
         hintStyle: TextStyle(color: Colors.grey[400]),
       ),
-      textTheme: TextTheme(bodySmall: TextStyle(color: Colors.grey[600])),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(color: customTextColor),
+        displayMedium: TextStyle(color: customTextColor),
+        displaySmall: TextStyle(color: customTextColor),
+        headlineLarge: TextStyle(color: customTextColor),
+        headlineMedium: TextStyle(color: customTextColor),
+        headlineSmall: TextStyle(color: customTextColor),
+        titleLarge: TextStyle(color: customTextColor),
+        titleMedium: TextStyle(color: customTextColor),
+        titleSmall: TextStyle(color: customTextColor),
+        bodyLarge: TextStyle(color: customTextColor),
+        bodyMedium: TextStyle(color: customTextColor),
+        bodySmall: TextStyle(color: customTextColor),
+        labelLarge: TextStyle(color: customTextColor),
+        labelMedium: TextStyle(color: customTextColor),
+        labelSmall: TextStyle(color: customTextColor),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF6B46C1),
+        selectedItemColor: customPrimaryColor, // Pink instead of purple
         unselectedItemColor: Colors.grey,
       ),
     );
@@ -75,13 +98,18 @@ class ThemeProvider extends ChangeNotifier {
 
   // Dark Theme
   static ThemeData get darkTheme {
+    const Color customTextColor = Color(
+      0xFFFF4081,
+    ); // Lighter pink for dark mode
+    const Color customPrimaryColor = Color(
+      0xFFFF4081,
+    ); // Same lighter pink for primary elements
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(
-          0xFFB794F6,
-        ), // Even lighter purple for better dark mode contrast
+        seedColor: customPrimaryColor, // Pink primary color instead of purple
         brightness: Brightness.dark,
       ),
       scaffoldBackgroundColor: const Color(0xFF121212),
@@ -91,7 +119,7 @@ class ThemeProvider extends ChangeNotifier {
         elevation: 0,
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
+        foregroundColor: customTextColor,
       ),
       cardTheme: CardThemeData(
         elevation: 4,
@@ -101,6 +129,8 @@ class ThemeProvider extends ChangeNotifier {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 2,
+          backgroundColor: customPrimaryColor,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -112,12 +142,28 @@ class ThemeProvider extends ChangeNotifier {
         fillColor: const Color(0xFF2A2A2A),
         hintStyle: TextStyle(color: Colors.grey[400]),
       ),
-      textTheme: const TextTheme(bodySmall: TextStyle(color: Colors.grey)),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF1E1E1E),
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(color: customTextColor),
+        displayMedium: TextStyle(color: customTextColor),
+        displaySmall: TextStyle(color: customTextColor),
+        headlineLarge: TextStyle(color: customTextColor),
+        headlineMedium: TextStyle(color: customTextColor),
+        headlineSmall: TextStyle(color: customTextColor),
+        titleLarge: TextStyle(color: customTextColor),
+        titleMedium: TextStyle(color: customTextColor),
+        titleSmall: TextStyle(color: customTextColor),
+        bodyLarge: TextStyle(color: customTextColor),
+        bodyMedium: TextStyle(color: customTextColor),
+        bodySmall: TextStyle(color: customTextColor),
+        labelLarge: TextStyle(color: customTextColor),
+        labelMedium: TextStyle(color: customTextColor),
+        labelSmall: TextStyle(color: customTextColor),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
         elevation: 8,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF8B5CF6),
+        selectedItemColor: customPrimaryColor, // Pink instead of purple
         unselectedItemColor: Colors.grey,
       ),
     );

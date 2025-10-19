@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/main_navigation_screen.dart';
-import 'services/gemini_service.dart';
 import 'providers/theme_provider.dart';
 
-void main() {
-  // Initialize Gemini AI services
-  GeminiService.initialize();
-
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const SmartChefApp());
 }
 

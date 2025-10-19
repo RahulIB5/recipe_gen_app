@@ -75,11 +75,17 @@ class _ProfileScreenState extends State<ProfileScreen>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          backgroundColor: Theme.of(context).cardColor,
+          title: Row(
             children: [
-              Icon(Icons.settings, color: Colors.purple),
-              SizedBox(width: 12),
-              Text('Settings'),
+              Icon(Icons.settings, color: Theme.of(context).primaryColor),
+              const SizedBox(width: 12),
+              Text(
+                'Settings',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                ),
+              ),
             ],
           ),
           content: Column(
@@ -93,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: Theme.of(context).dividerColor.withOpacity(0.3),
                         width: 1,
                       ),
                     ),
@@ -135,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Theme.of(context).dividerColor.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -177,7 +183,10 @@ class _ProfileScreenState extends State<ProfileScreen>
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Close'),
+              child: Text(
+                'Close',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
             ),
           ],
         );
@@ -188,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -196,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -233,7 +242,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                             Text(
                               _currentUser.email,
                               style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: Colors.grey[600]),
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.color,
+                                  ),
                             ),
                           ],
                         ),
@@ -272,11 +285,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
             // Tabs
             Container(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               child: TabBar(
                 controller: _tabController,
                 labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: Colors.grey,
+                unselectedLabelColor: Theme.of(context).hintColor,
                 indicatorColor: Theme.of(context).primaryColor,
                 tabs: const [
                   Tab(text: 'Favorites'),
@@ -308,9 +321,19 @@ class _ProfileScreenState extends State<ProfileScreen>
       children: [
         Text(
           value,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
         ),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+        ),
       ],
     );
   }
@@ -378,9 +401,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           const SizedBox(height: 8),
           Text(
             'Select your dietary preferences to get personalized recipe recommendations.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -407,7 +430,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Theme.of(context).primaryColor
-                          : Colors.white,
+                          : Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Theme.of(context).primaryColor,
@@ -425,9 +448,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (isSelected)
-                          const Icon(
+                          Icon(
                             Icons.check,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             size: 18,
                           ),
                         if (isSelected) const SizedBox(width: 8),
@@ -436,7 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             preference,
                             style: TextStyle(
                               color: isSelected
-                                  ? Colors.white
+                                  ? Theme.of(context).colorScheme.onPrimary
                                   : Theme.of(context).primaryColor,
                               fontWeight: FontWeight.w500,
                             ),
@@ -481,22 +504,22 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 80, color: Colors.grey[400]),
+          Icon(icon, size: 80, color: Theme.of(context).hintColor),
           const SizedBox(height: 16),
           Text(
             title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+            ),
           ),
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               subtitle,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).hintColor,
+              ),
               textAlign: TextAlign.center,
             ),
           ),

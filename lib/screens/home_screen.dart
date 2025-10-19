@@ -5,7 +5,6 @@ import '../data/recipe_repository.dart';
 import '../widgets/recipe_card.dart';
 import '../models/recipe.dart';
 import '../providers/theme_provider.dart';
-import 'api_test_screen.dart';
 
 // Home screen with recipe discovery carousel
 class HomeScreen extends StatefulWidget {
@@ -21,7 +20,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Recipe> _filteredRecipes = [];
   String _selectedCategory = '';
   bool _isLoading = true;
+  bool _isLoadingMore = false;
   String? _error;
+  int _currentOffset = 0;
+  final int _recipesPerPage = 20;
+  bool _hasMoreRecipes = true;
 
   @override
   void initState() {
@@ -29,24 +32,50 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadRecipes();
   }
 
-  Future<void> _loadRecipes() async {
+  Future<void> _loadRecipes({bool loadMore = false}) async {
     try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+      if (!loadMore) {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+          _currentOffset = 0;
+          _hasMoreRecipes = true;
+        });
+      } else {
+        setState(() {
+          _isLoadingMore = true;
+        });
+      }
 
-      final recipes = await RecipeRepository.getAllRecipes();
+      final recipes = await RecipeRepository.getAllRecipes(
+        offset: loadMore ? _currentOffset : 0,
+        limit: _recipesPerPage,
+        forceRefresh: !loadMore,
+      );
 
       setState(() {
-        _allRecipes = recipes;
-        _filteredRecipes = recipes;
-        _isLoading = false;
+        if (loadMore) {
+          _allRecipes.addAll(recipes);
+          _filteredRecipes.addAll(recipes);
+          _currentOffset += _recipesPerPage;
+          _hasMoreRecipes = recipes.length == _recipesPerPage;
+          _isLoadingMore = false;
+        } else {
+          _allRecipes = recipes;
+          _filteredRecipes = recipes;
+          _currentOffset = _recipesPerPage;
+          _hasMoreRecipes = recipes.length == _recipesPerPage;
+          _isLoading = false;
+        }
       });
     } catch (e) {
       setState(() {
         _error = 'Failed to load recipes: $e';
-        _isLoading = false;
+        if (loadMore) {
+          _isLoadingMore = false;
+        } else {
+          _isLoading = false;
+        }
       });
     }
   }
@@ -55,12 +84,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (query.isEmpty) {
       setState(() {
         _filteredRecipes = _allRecipes;
+        _hasMoreRecipes = _allRecipes.length >= _recipesPerPage;
       });
     } else {
       try {
         final searchResults = await RecipeRepository.searchRecipes(query);
         setState(() {
           _filteredRecipes = searchResults;
+          _hasMoreRecipes =
+              false; // Search results don't support pagination yet
         });
       } catch (e) {
         // Fallback to local filtering
@@ -75,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   (tag) => tag.toLowerCase().contains(query.toLowerCase()),
                 );
           }).toList();
+          _hasMoreRecipes = false;
         });
       }
     }
@@ -83,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _filterByCategory(String category) async {
     setState(() {
       _selectedCategory = category;
+      _currentOffset = 0;
+      _hasMoreRecipes = true;
     });
 
     if (category.isEmpty) {
@@ -96,6 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         setState(() {
           _filteredRecipes = categoryResults;
+          _hasMoreRecipes =
+              false; // Category filtering doesn't support pagination yet
         });
       } catch (e) {
         // Fallback to local filtering
@@ -105,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
               (tag) => tag.toLowerCase().contains(category.toLowerCase()),
             );
           }).toList();
+          _hasMoreRecipes = false;
         });
       }
     }
@@ -228,19 +266,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               },
                             ),
-                            // API Test Button
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ApiTestScreen(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.api),
-                              tooltip: 'Test Spoonacular API',
-                            ),
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -325,36 +350,68 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 8),
 
-              // Swipeable Featured Recipes Carousel
+              // Main Recipe Carousel - All 50 Recipes
               if (displayRecipes.isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    'Featured Recipes',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                CarouselSlider.builder(
-                  itemCount: displayRecipes.length > 5
-                      ? 5
-                      : displayRecipes.length,
-                  itemBuilder: (context, index, realIndex) {
-                    return RecipeCard(
-                      recipe: displayRecipes[index],
-                      isLarge: true,
-                    );
-                  },
-                  options: CarouselOptions(
-                    height: 120,
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 4),
-                    viewportFraction: 0.8,
-                    enableInfiniteScroll: true,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Discover Recipes',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${displayRecipes.length} recipes',
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
+                CarouselSlider.builder(
+                  itemCount: displayRecipes.length, // Show ALL recipes
+                  itemBuilder: (context, index, realIndex) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: EnhancedRecipeCard(recipe: displayRecipes[index]),
+                    );
+                  },
+                  options: CarouselOptions(
+                    height: 300, // Slightly taller for better visibility
+                    enlargeCenterPage: true,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 4),
+                    autoPlayAnimationDuration: const Duration(
+                      milliseconds: 1000,
+                    ),
+                    autoPlayCurve: Curves.easeInOutCubic,
+                    viewportFraction: 0.8,
+                    enableInfiniteScroll: true,
+                    scrollDirection: Axis.horizontal,
+                    enlargeFactor: 0.25,
+                    padEnds: false,
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
 
               // Quick Categories Dropdown
@@ -565,6 +622,79 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
+
+              // Load More Button
+              if (_hasMoreRecipes &&
+                  !_isLoading &&
+                  _selectedCategory.isEmpty &&
+                  _searchController.text.isEmpty) ...[
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoadingMore
+                          ? null
+                          : () => _loadRecipes(loadMore: true),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoadingMore
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Theme.of(context).colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Loading more recipes...',
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.expand_more,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Load More Recipes',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
             ],
           ),
         ),

@@ -107,26 +107,56 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (BuildContext context) {
         return SafeArea(
           child: Wrap(
             children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Select Image Source',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
+                leading: Icon(
+                  Icons.photo_library,
+                  color: Theme.of(context).primaryColor,
+                ),
+                title: Text(
+                  'Gallery',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImage(ImageSource.gallery);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Camera'),
+                leading: Icon(
+                  Icons.photo_camera,
+                  color: Theme.of(context).primaryColor,
+                ),
+                title: Text(
+                  'Camera',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImage(ImageSource.camera);
                 },
               ),
+              const SizedBox(height: 16),
             ],
           ),
         );
@@ -172,7 +202,11 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                         Text(
                           'Snap a photo and discover recipes!',
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: Colors.grey[600]),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color,
+                              ),
                         ),
                       ],
                     ),
@@ -187,7 +221,7 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -216,7 +250,7 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).cardColor,
                         foregroundColor: Theme.of(context).primaryColor,
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
@@ -243,7 +277,7 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                         ),
                       ),
                       child: _isProcessing
-                          ? const Row(
+                          ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
@@ -252,12 +286,12 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                                      Theme.of(context).colorScheme.onPrimary,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                Text('Processing...'),
+                                const SizedBox(width: 8),
+                                const Text('Processing...'),
                               ],
                             )
                           : const Row(
@@ -289,20 +323,24 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.photo_camera_outlined, size: 80, color: Colors.grey[400]),
+        Icon(
+          Icons.photo_camera_outlined,
+          size: 80,
+          color: Theme.of(context).hintColor,
+        ),
         const SizedBox(height: 16),
         Text(
           'No image selected',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
         ),
         const SizedBox(height: 8),
         Text(
           'Take a photo or select from gallery\nto identify dishes and get recipes',
           style: Theme.of(
             context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
+          ).textTheme.bodyMedium?.copyWith(color: Theme.of(context).hintColor),
           textAlign: TextAlign.center,
         ),
       ],
@@ -324,11 +362,13 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
                       return Container(
                         width: double.infinity,
                         height: 200,
-                        color: Colors.grey[200],
-                        child: const Icon(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.grey[200],
+                        child: Icon(
                           Icons.image,
                           size: 64,
-                          color: Colors.grey,
+                          color: Theme.of(context).hintColor,
                         ),
                       );
                     },
@@ -377,7 +417,7 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -392,7 +432,7 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 24),
+              const Icon(Icons.check_circle, color: Colors.green, size: 24),
               const SizedBox(width: 8),
               Text(
                 'Detection Results',
@@ -428,7 +468,10 @@ class _ImageRecognitionScreenState extends State<ImageRecognitionScreen> {
           // Confidence
           Text(
             'Confidence: ${(result.confidence * 100).toStringAsFixed(1)}%',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+              fontSize: 14,
+            ),
           ),
 
           const SizedBox(height: 16),

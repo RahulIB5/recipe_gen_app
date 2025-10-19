@@ -15,7 +15,7 @@ class ApiConfig {
 
   // Fallback settings
   static const bool useFallbackData =
-      true; // Set to false when you have a valid API key
+      false; // Set to false to use only API data
   static const int requestTimeoutSeconds = 10;
 
   // Cache settings
