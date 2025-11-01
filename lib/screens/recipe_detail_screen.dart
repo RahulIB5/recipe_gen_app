@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/recipe.dart';
+import '../widgets/favorite_button.dart';
 
 // Detailed view of a recipe with all information
 class RecipeDetailScreen extends StatefulWidget {
@@ -15,15 +16,6 @@ class RecipeDetailScreen extends StatefulWidget {
 }
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
-  bool isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // In a real app, check if recipe is in user's favorites
-    isFavorite = false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,27 +60,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               ),
             ),
             actions: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    isFavorite = !isFavorite;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isFavorite
-                            ? 'Added to favorites!'
-                            : 'Removed from favorites!',
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.red : Colors.white,
-                ),
+              FavoriteButton(
+                recipe: widget.recipe,
+                size: 28,
+                activeColor: Colors.red,
+                inactiveColor: Colors.white,
               ),
+              const SizedBox(width: 8),
             ],
           ),
           // Recipe content

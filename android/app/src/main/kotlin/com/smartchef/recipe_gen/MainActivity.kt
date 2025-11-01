@@ -1,0 +1,5 @@
+package com.smartchef.recipe_gen
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

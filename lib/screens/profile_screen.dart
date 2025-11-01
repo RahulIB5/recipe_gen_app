@@ -3,6 +3,8 @@ import '../models/user.dart';
 import '../models/recipe.dart';
 import '../data/dummy_data.dart';
 import '../widgets/recipe_card.dart';
+import '../services/auth_service.dart';
+import '../services/favorites_service.dart';
 
 // Profile screen with user preferences, favorites, and history
 class ProfileScreen extends StatefulWidget {
@@ -16,12 +18,40 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   late TabController _tabController;
   User _currentUser = DummyData.currentUser;
   List<String> _selectedPreferences = [];
+  final AuthService _authService = AuthService();
+  int _favoritesCount = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _selectedPreferences = List.from(_currentUser.dietaryPreferences);
+    _loadUserData();
+    _loadFavoritesCount();
+  }
+
+  /// Load user data from Firebase Auth
+  void _loadUserData() {
+    final user = _authService.currentUser;
+    if (user != null) {
+      // Update user data with Firebase Auth info
+      _currentUser = _currentUser.copyWith(
+        name: user.displayName ?? _currentUser.name,
+        email: user.email ?? _currentUser.email,
+      );
+      setState(() {});
+    }
+  }
+
+  /// Load favorites count from Firestore
+  void _loadFavoritesCount() {
+    FavoritesService.getFavoriteRecipesStream().listen((favorites) {
+      if (mounted) {
+        setState(() {
+          _favoritesCount = favorites.length;
+        });
+      }
+    });
   }
 
   @override
@@ -55,16 +85,134 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     );
   }
 
-  List<Recipe> _getFavoriteRecipes() {
-    return DummyData.recipes
-        .where((recipe) => _currentUser.favoriteRecipeIds.contains(recipe.id))
-        .toList();
-  }
-
   List<Recipe> _getHistoryRecipes() {
     return DummyData.recipes
         .where((recipe) => _currentUser.recipeHistory.contains(recipe.id))
         .toList();
+  }
+
+  /// Show settings bottom sheet with logout option
+  void _showSettingsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Settings title
+              Text(
+                'Settings',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              
+              // Account info
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                  child: Icon(
+                    Icons.person,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+                title: Text(_currentUser.name),
+                subtitle: Text(_currentUser.email),
+              ),
+              
+              const Divider(),
+              
+              // Logout option
+              ListTile(
+                leading: const Icon(
+                  Icons.logout,
+                  color: Colors.red,
+                ),
+                title: const Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleLogout();
+                },
+              ),
+              
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Handle user logout
+  Future<void> _handleLogout() async {
+    // Show confirmation dialog
+    final bool? confirmLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmLogout == true) {
+      try {
+        await _authService.signOut();
+        // Navigation is handled by AuthWrapper in main.dart
+        // User will automatically be redirected to LoginScreen
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error signing out: $e'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -122,13 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                       ),
                       IconButton(
                         onPressed: () {
-                          // Settings functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Settings coming soon!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                          _showSettingsBottomSheet();
                         },
                         icon: const Icon(Icons.settings),
                       ),
@@ -140,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildStatCard('Favorites', '${_getFavoriteRecipes().length}'),
+                      _buildStatCard('Favorites', '$_favoritesCount'),
                       _buildStatCard('Cooked', '${_getHistoryRecipes().length}'),
                       _buildStatCard('Preferences', '${_selectedPreferences.length}'),
                     ],
@@ -204,27 +346,71 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   }
 
   Widget _buildFavoritesTab() {
-    final favoriteRecipes = _getFavoriteRecipes();
-    
-    if (favoriteRecipes.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.favorite_border,
-        title: 'No Favorites Yet',
-        subtitle: 'Start exploring recipes and mark your favorites!',
-      );
-    }
+    return StreamBuilder<List<Recipe>>(
+      stream: FavoritesService.getFavoriteRecipesStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: favoriteRecipes.length,
-      itemBuilder: (context, index) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          height: 200,
-          child: RecipeCard(
-            recipe: favoriteRecipes[index],
-            isLarge: true,
-          ),
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 80,
+                  color: Colors.red[300],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Error loading favorites',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Colors.red[600],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    'Please try again later',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final favoriteRecipes = snapshot.data ?? [];
+        
+        if (favoriteRecipes.isEmpty) {
+          return _buildEmptyState(
+            icon: Icons.favorite_border,
+            title: 'No Favorites Yet',
+            subtitle: 'Start exploring recipes and tap the heart icon to save your favorites!',
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: favoriteRecipes.length,
+          itemBuilder: (context, index) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              height: 200,
+              child: RecipeCard(
+                recipe: favoriteRecipes[index],
+                isLarge: true,
+              ),
+            );
+          },
         );
       },
     );

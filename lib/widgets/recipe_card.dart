@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import '../models/recipe.dart';
 import '../screens/recipe_detail_screen.dart';
+import 'favorite_button.dart';
 
 // Custom widget for recipe cards in the carousel
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
   final bool isLarge;
+  final VoidCallback? onTap;
 
   const RecipeCard({
     super.key,
     required this.recipe,
     this.isLarge = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         Navigator.push(
           context,
           PageRouteBuilder(
@@ -47,25 +50,61 @@ class RecipeCard extends StatelessWidget {
               // Background image
               Container(
                 height: isLarge ? 300 : 200,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(recipe.imageUrl),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) {
-                      // Handle image loading error
-                    },
-                  ),
+                child: Image.network(
+                  recipe.imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.restaurant,
+                            size: 50,
+                            color: Colors.grey[600],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Image not available',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / 
+                                loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.7),
-                      ],
-                    ),
+              ),
+              // Overlay gradient
+              Container(
+                height: isLarge ? 300 : 200,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
                   ),
                 ),
               ),
@@ -139,6 +178,17 @@ class RecipeCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+              // Favorite button in top-right corner
+              Positioned(
+                top: 12,
+                right: 12,
+                child: FavoriteButton(
+                  recipe: recipe,
+                  size: 20,
+                  activeColor: Colors.red,
+                  inactiveColor: Colors.white.withOpacity(0.7),
                 ),
               ),
             ],
