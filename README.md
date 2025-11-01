@@ -1,146 +1,201 @@
 # SmartChef - AI-Powered Recipe Discovery App
 
-A modern Flutter mobile app for recipe discovery and AI-powered cooking assistance.
+A modern Flutter mobile app for recipe discovery, search functionality, and favorites management with Firebase integration.
 
 ## 🍳 Features
 
-### 1. Recipe Discovery Module
-- **Swipeable Carousel**: Browse featured recipes with beautiful cards
-- **Recipe Details**: Step-by-step instructions, nutritional info, and ingredients
-- **Search Functionality**: Find recipes by name or ingredients
-- **Categories**: Quick access to breakfast, lunch, dinner, and more
+### Core Functionality
+- **Recipe Search**: Search recipes by name using Spoonacular API
+- **Ingredient-Based Search**: Find recipes using available ingredients
+- **Favorites System**: Save and manage favorite recipes with Firebase
+- **User Authentication**: Email/password and Google OAuth login
+- **Real-time Sync**: Favorites synchronized across devices
 
-### 2. AI Recipe Generator Module
-- **Ingredient-Based Generation**: Input available ingredients to get recipe suggestions
-- **Quick Select**: Choose from common ingredients with tap selection
-- **Smart Recommendations**: AI-powered recipe creation based on your ingredients
-- **Custom Recipes**: Generated recipes tailored to your available ingredients
-
-### 3. Image Recognition Module
-- **Photo Capture**: Take photos of dishes using camera or gallery
-- **AI Dish Detection**: Identify dishes with confidence scores
-- **Recipe Suggestions**: Get recommended recipes for detected dishes
-- **Visual Recognition**: Powered by mock Gemini Vision API
-
-### 4. User Profile Module
-- **Dietary Preferences**: Set and manage dietary restrictions (vegan, keto, etc.)
-- **Favorites**: Save and organize your favorite recipes
-- **Cooking History**: Track your cooking adventures
-- **Personal Stats**: View your cooking statistics
-
-## 🎨 Design Features
-
+### User Experience
 - **Material 3 Design**: Modern, clean UI with beautiful animations
-- **Responsive Layout**: Optimized for different screen sizes
-- **Smooth Animations**: Hero transitions and page animations
-- **Custom Components**: Reusable widgets for consistent design
-- **Bottom Navigation**: Easy access to all main features
-
-## 📱 Screenshots
-
-The app includes:
-- Home screen with recipe carousel
-- AI recipe generator with ingredient selection
-- Image recognition with camera integration
-- Profile with preferences and favorites
+- **Recipe Carousel**: Browse featured recipes with swipeable cards
+- **Detailed Recipe View**: Complete ingredients, instructions, and nutrition info
+- **Search Categories**: Quick access to popular recipe categories
+- **Profile Management**: View favorites and manage account settings
 
 ## 🚀 Technical Stack
 
 - **Framework**: Flutter (Dart)
+- **Backend**: Firebase (Auth, Firestore)
+- **API Integration**: Spoonacular Recipe API
+- **Authentication**: Firebase Auth with Google Sign-In
+- **Database**: Cloud Firestore for favorites
 - **State Management**: StatefulWidget with setState
-- **Image Handling**: image_picker package
-- **UI Components**: carousel_slider for recipe browsing
-- **HTTP Requests**: http package (ready for API integration)
+- **Environment**: flutter_dotenv for secure API key management
+
+## 📱 Key Screens
+
+1. **Home Screen**: Recipe carousel, search bar, popular categories
+2. **Search Results**: Grid/list view of recipe results
+3. **Recipe Details**: Complete recipe information with favorite option
+4. **Ingredients Screen**: Search recipes by available ingredients
+5. **Profile Screen**: User info, favorites, and settings
+6. **Authentication**: Login/register with email or Google
+
+## � Setup & Installation
+
+### Prerequisites
+- Flutter SDK (3.8.1+)
+- Firebase project setup
+- Spoonacular API key
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/RahulIB5/recipe_gen_app
+cd recipe_gen_app
+```
+
+### 2. Environment Setup
+Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+```env
+SPOONACULAR_API_KEY=your_spoonacular_api_key_here
+SPOONACULAR_BASE_URL=https://api.spoonacular.com
+```
+
+### 3. Get API Keys
+
+**Spoonacular API**:
+1. Visit [Spoonacular API](https://spoonacular.com/food-api)
+2. Sign up for a free account
+3. Get your API key from the dashboard
+4. Add it to your `.env` file
+
+### 4. Firebase Setup
+1. Create a Firebase project
+2. Enable Authentication (Email/Password, Google)
+3. Create Firestore database
+4. Download `google-services.json` (Android) / `GoogleService-Info.plist` (iOS)
+5. Place configuration files in respective platform folders
+
+### 5. Install Dependencies
+```bash
+flutter pub get
+```
+
+### 6. Run the App
+```bash
+flutter run
+```
 
 ## 📁 Project Structure
 
 ```
 lib/
-├── main.dart                 # App entry point
-├── models/                   # Data models
-│   ├── recipe.dart          # Recipe and nutrition models
-│   └── user.dart            # User and AI request models
-├── screens/                  # App screens
+├── main.dart                    # App entry point with Firebase init
+├── config/
+│   └── api_config.dart         # API configuration with env variables
+├── models/
+│   ├── recipe.dart            # Recipe and nutrition models
+│   └── user.dart              # User models
+├── screens/
 │   ├── main_navigation_screen.dart
 │   ├── home_screen.dart
-│   ├── ai_recipe_generator_screen.dart
-│   ├── image_recognition_screen.dart
+│   ├── search_results_screen.dart
+│   ├── ingredients_screen.dart
 │   ├── profile_screen.dart
-│   └── recipe_detail_screen.dart
-├── widgets/                  # Reusable widgets
-│   └── recipe_card.dart     # Custom recipe card component
-└── data/                    # Mock data
-    └── dummy_data.dart      # Sample recipes and user data
+│   ├── recipe_detail_screen.dart
+│   └── auth/
+│       └── enhanced_login_screen.dart
+├── services/
+│   ├── auth_service.dart      # Firebase authentication
+│   ├── favorites_service.dart # Firestore favorites management
+│   └── spoonacular_service.dart # API service
+├── widgets/
+│   ├── recipe_card.dart       # Reusable recipe card
+│   └── favorite_button.dart   # Heart icon for favorites
+└── data/
+    └── dummy_data.dart        # Sample data for offline testing
 ```
 
-## 🔧 Setup & Installation
+## � Security Features
 
-1. **Prerequisites**:
-   - Flutter SDK installed
-   - Android Studio or VS Code with Flutter extensions
-   - Android emulator or physical device
+- **Environment Variables**: API keys stored securely in `.env` file
+- **Firebase Rules**: Secure Firestore rules for user data
+- **Authentication**: Proper user authentication with Firebase
+- **Git Safety**: `.env` file excluded from version control
 
-2. **Installation**:
-   ```bash
-   git clone https://github.com/RahulIB5/recipe_gen_app
-   cd recipe_gen_app
-   flutter pub get
-   flutter run
-   ```
+## 🎯 API Integration
 
-3. **Dependencies**:
-   - `carousel_slider: ^4.2.1` - For recipe carousels
-   - `image_picker: ^1.0.4` - For camera/gallery access
-   - `http: ^1.1.0` - For future API integration
+### Spoonacular API Endpoints Used
+- **Complex Search**: `/recipes/complexSearch` - Search recipes by name
+- **Find by Ingredients**: `/recipes/findByIngredients` - Ingredient-based search
+- **Recipe Information**: `/recipes/{id}/information` - Detailed recipe data
 
-## 🎯 Future Enhancements
+### Firebase Services
+- **Authentication**: User login/register with email and Google
+- **Firestore**: Real-time favorites storage and synchronization
+- **Security Rules**: Proper data access control
 
-### Real API Integration
-- Replace dummy data with real Gemini API calls
-- Implement actual image recognition
-- Add real user authentication
-- Connect to recipe databases
+## 📊 Features in Detail
 
-### Additional Features
-- Shopping list generation
-- Meal planning
-- Recipe sharing
-- Cooking timers
-- Video tutorials
-- Social features
+### Search Functionality
+- Real-time search with Spoonacular API
+- Popular search suggestions
+- Search by recipe name or ingredients
+- Detailed recipe information on tap
 
-### Performance Optimizations
-- Image caching
-- Lazy loading
-- State management with Provider/Bloc
-- Offline support
+### Favorites System
+- Heart icon to add/remove favorites
+- Real-time updates with Firestore
+- Favorites persist across app sessions
+- Profile page shows all saved recipes
+
+### Authentication
+- Email/password registration and login
+- Google OAuth integration
+- Automatic login state management
+- Secure user session handling
 
 ## 🧪 Testing
 
-The app is built with dummy data for immediate testing:
-- Sample recipes with full details
-- Mock AI recipe generation
-- Simulated image recognition
-- Test user profiles and preferences
+The app includes both real API integration and fallback dummy data:
+- **Live API**: Full Spoonacular integration for recipe search
+- **Offline Support**: Dummy data when API is unavailable
+- **Firebase**: Real user authentication and data storage
+- **Error Handling**: Graceful handling of API failures
 
-All features are fully functional with mock data, making it easy to test the complete user experience.
+## 📝 Dependencies
 
-## 📝 Code Quality
+```yaml
+dependencies:
+  flutter: sdk: flutter
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.3
+  google_sign_in: ^6.2.0
+  http: ^1.1.0
+  carousel_slider: ^5.1.0
+  flutter_dotenv: ^5.1.0
+  flutter_spinkit: ^5.2.0
+```
 
-- **Clean Architecture**: Well-organized folder structure
-- **Commented Code**: Extensive documentation for easy maintenance
-- **Reusable Components**: Modular widget design
-- **Error Handling**: Graceful error handling throughout
-- **Responsive Design**: Adaptable to different screen sizes
+## � Future Enhancements
+
+- Recipe meal planning
+- Shopping list generation
+- Cooking timers and notifications
+- Recipe sharing and social features
+- Offline recipe caching
+- Advanced search filters
+- Recipe ratings and reviews
 
 ## 🎨 Customization
 
-The app is designed for easy customization:
-- **Theme Colors**: Modify primary colors in `main.dart`
-- **Recipe Data**: Update `dummy_data.dart` for different content
-- **UI Components**: Customize widgets in the `widgets/` folder
-- **Navigation**: Adjust bottom navigation in `main_navigation_screen.dart`
+- **Theme**: Modify colors in `main.dart` MaterialApp theme
+- **API**: Add more recipe APIs in `services/` folder
+- **UI Components**: Customize widgets for different layouts
+- **Firebase Rules**: Adjust Firestore security rules as needed
 
 ---
 
-**SmartChef** - Your AI-powered cooking companion! 👨‍🍳✨
+**SmartChef** - Your complete recipe discovery and management companion! 👨‍🍳✨
