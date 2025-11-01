@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/auth/enhanced_login_screen.dart';
 
@@ -10,11 +11,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
+    // Load environment variables
+    await dotenv.load(fileName: ".env");
+    print('✅ Environment variables loaded successfully');
+    
     // Initialize Firebase
     await Firebase.initializeApp();
     print('✅ Firebase initialized successfully');
   } catch (e) {
-    print('❌ Firebase initialization error: $e');
+    print('❌ Initialization error: $e');
   }
   
   runApp(const SmartChefApp());
