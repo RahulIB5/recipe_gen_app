@@ -1,10 +1,11 @@
 # SmartChef - AI-Powered Recipe Discovery App
 
-A modern Flutter mobile app for recipe discovery, search functionality, and favorites management with Firebase integration.
+A modern Flutter mobile app for recipe discovery, AI-powered food recognition, search functionality, and favorites management with Firebase integration.
 
 ## 🍳 Features
 
 ### Core Functionality
+- **AI Food Recognition**: Identify food items from photos using Google Gemini AI
 - **Recipe Search**: Search recipes by name using Spoonacular API
 - **Ingredient-Based Search**: Find recipes using available ingredients
 - **Favorites System**: Save and manage favorite recipes with Firebase
@@ -18,25 +19,29 @@ A modern Flutter mobile app for recipe discovery, search functionality, and favo
 - **Detailed Recipe View**: Complete ingredients, instructions, and nutrition info
 - **Search Categories**: Quick access to popular recipe categories
 - **Profile Management**: View favorites and manage account settings
+- **Camera Integration**: Take photos or select from gallery for food recognition
 
 ## 🚀 Technical Stack
 
 - **Framework**: Flutter (Dart)
 - **Backend**: Firebase (Auth, Firestore)
+- **AI/ML**: Google Gemini AI (gemini-2.0-flash model)
 - **API Integration**: Spoonacular Recipe API
 - **Authentication**: Firebase Auth with Google Sign-In
 - **Database**: Cloud Firestore for favorites
+- **Image Processing**: Image Picker for camera/gallery
 - **State Management**: StatefulWidget with setState
 - **Environment**: flutter_dotenv for secure API key management
 
 ## 📱 Key Screens
 
-1. **Home Screen**: Recipe carousel, search bar, popular categories
-2. **Search Results**: Grid/list view of recipe results
-3. **Recipe Details**: Complete recipe information with favorite option
-4. **Ingredients Screen**: Search recipes by available ingredients
-5. **Profile Screen**: User info, favorites, and settings
-6. **Authentication**: Login/register with email or Google
+1. **Home Screen**: Recipe carousel, search bar, AI food recognition button, popular categories
+2. **AI Food Recognition**: Take/select photo, identify food with AI, get recipe suggestions
+3. **Search Results**: Grid/list view of recipe results
+4. **Recipe Details**: Complete recipe information with favorite option
+5. **Ingredients Screen**: Search recipes by available ingredients
+6. **Profile Screen**: User info, favorites, and settings
+7. **Authentication**: Login/register with email or Google
 
 ## � Setup & Installation
 
@@ -61,6 +66,7 @@ Edit `.env` and add your API keys:
 ```env
 SPOONACULAR_API_KEY=your_spoonacular_api_key_here
 SPOONACULAR_BASE_URL=https://api.spoonacular.com
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### 3. Get API Keys
@@ -70,6 +76,12 @@ SPOONACULAR_BASE_URL=https://api.spoonacular.com
 2. Sign up for a free account
 3. Get your API key from the dashboard
 4. Add it to your `.env` file
+
+**Google Gemini AI API**:
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the generated key and add it to your `.env` file
 
 ### 4. Firebase Setup
 1. Create a Firebase project
@@ -105,12 +117,14 @@ lib/
 │   ├── ingredients_screen.dart
 │   ├── profile_screen.dart
 │   ├── recipe_detail_screen.dart
+│   ├── gemini_food_recognition_screen.dart  # AI food recognition
 │   └── auth/
 │       └── enhanced_login_screen.dart
 ├── services/
 │   ├── auth_service.dart      # Firebase authentication
 │   ├── favorites_service.dart # Firestore favorites management
-│   └── spoonacular_service.dart # API service
+│   ├── spoonacular_service.dart # Recipe API service
+│   └── gemini_service.dart    # Google Gemini AI service
 ├── widgets/
 │   ├── recipe_card.dart       # Reusable recipe card
 │   └── favorite_button.dart   # Heart icon for favorites
@@ -127,6 +141,13 @@ lib/
 
 ## 🎯 API Integration
 
+### Google Gemini AI
+- **Model**: gemini-2.0-flash (multimodal - text + images)
+- **Purpose**: Food identification from images
+- **Features**: Fast inference, cost-effective, high accuracy
+- **Input**: JPEG images up to 1024x1024 resolution
+- **Output**: Clean food item names for recipe search
+
 ### Spoonacular API Endpoints Used
 - **Complex Search**: `/recipes/complexSearch` - Search recipes by name
 - **Find by Ingredients**: `/recipes/findByIngredients` - Ingredient-based search
@@ -138,6 +159,13 @@ lib/
 - **Security Rules**: Proper data access control
 
 ## 📊 Features in Detail
+
+### AI Food Recognition
+- Take photos with camera or select from gallery
+- Google Gemini AI identifies food items
+- Automatic recipe search based on identified food
+- Image quality optimization (max 1024x1024, 85% quality)
+- Comprehensive error handling and user feedback
 
 ### Search Functionality
 - Real-time search with Spoonacular API
@@ -170,18 +198,26 @@ The app includes both real API integration and fallback dummy data:
 ```yaml
 dependencies:
   flutter: sdk: flutter
+  # Firebase
   firebase_core: ^3.15.2
   firebase_auth: ^5.3.1
   cloud_firestore: ^5.4.3
+  # Authentication
   google_sign_in: ^6.2.0
+  # AI & APIs
+  google_generative_ai: ^0.4.7
   http: ^1.1.0
+  # UI Components
   carousel_slider: ^5.1.0
-  flutter_dotenv: ^5.1.0
   flutter_spinkit: ^5.2.0
+  image_picker: ^1.0.4
+  # Configuration
+  flutter_dotenv: ^5.1.0
 ```
 
-## � Future Enhancements
+## 🔮 Future Enhancements
 
+- Advanced AI features (dietary restrictions detection, nutrition analysis)
 - Recipe meal planning
 - Shopping list generation
 - Cooking timers and notifications
@@ -189,6 +225,7 @@ dependencies:
 - Offline recipe caching
 - Advanced search filters
 - Recipe ratings and reviews
+- Multi-language support for AI food recognition
 
 ## 🎨 Customization
 
