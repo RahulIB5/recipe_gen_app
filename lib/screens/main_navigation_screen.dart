@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'ai_recipe_generator_screen.dart';
-import 'image_recognition_screen.dart';
+// import 'image_recognition_screen.dart';
+import 'gemini_food_recognition_screen.dart';
 import 'profile_screen.dart';
 
 // Main navigation screen with bottom navigation bar
@@ -18,7 +19,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const AIRecipeGeneratorScreen(),
-    const ImageRecognitionScreen(),
+    // const ImageRecognitionScreen(),
+    const GeminiFoodRecognitionScreen(),
     const ProfileScreen(),
   ];
 

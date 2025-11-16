@@ -51,6 +51,9 @@ dependencies:
   
   # Additional UI packages
   flutter_spinkit: ^5.2.0
+  
+  # Google Gemini AI for food recognition
+  google_generative_ai: ^0.4.7
 
 dev_dependencies:
   flutter_test:

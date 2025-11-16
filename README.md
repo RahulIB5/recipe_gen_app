@@ -11,6 +11,7 @@ A modern Flutter mobile app for recipe discovery, search functionality, and favo
 - **User Authentication**: Email/password and Google OAuth login
 - **Real-time Sync**: Favorites synchronized across devices
 
+
 ### User Experience
 - **Material 3 Design**: Modern, clean UI with beautiful animations
 - **Recipe Carousel**: Browse featured recipes with swipeable cards
